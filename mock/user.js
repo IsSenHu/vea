@@ -1,5 +1,3 @@
-import { OperationManageInstance } from '../src/utils/HttpUtils'
-
 const tokens = {
   admin: {
     token: 'admin-token'
@@ -31,12 +29,7 @@ export default [
     type: 'post',
     response: config => {
       const { username } = config.body
-      const { password } = config.body
-      console.error(username + ':' + password)
       const token = tokens[username]
-      OperationManageInstance({
-        method: 'post'
-      })
       // mock error
       if (!token) {
         return {

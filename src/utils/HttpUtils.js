@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const OperationManageInstance = axios.create({
-  baseURL: '',
+export const Power = axios.create({
+  baseURL: 'http://10.10.10.158:8080',
   withCredentials: false
 })
