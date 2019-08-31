@@ -35,7 +35,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       Power({
         method: 'post',
-        url: '/api/user/login',
+        url: '/auth/login',
         data: {
           username: username,
           password: password
@@ -85,7 +85,7 @@ const actions = {
           'Authorization': getToken()
         },
         method: 'post',
-        url: '/api/user/logout'
+        url: '/auth/logout'
       }).then(resp => {
         const respJson = resp.data
         const { code } = respJson
