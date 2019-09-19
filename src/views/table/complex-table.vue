@@ -255,17 +255,6 @@ export default {
       }
       this.handleFilter()
     },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
-    },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'

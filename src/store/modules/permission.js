@@ -1,6 +1,4 @@
-import { Power } from '@/utils/HttpUtils'
-import { getToken } from '@/utils/auth'
-import Layout from '@/layout'
+import { asyncRoutes, constantRoutes } from '@/router'
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -44,44 +42,20 @@ const state = {
 const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
-    state.routes = routes
+    state.routes = constantRoutes.concat(routes)
   }
 }
 
 const actions = {
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
-      let accessedRoutes = []
-      let constantRoutes = []
-      Power({
-        headers: {
-          'Authorization': getToken()
-        },
-        method: 'get',
-        url: '/api/route'
-      }).then(resp => {
-        const respData = resp.data
-        if (respData.code === 0) {
-          const data = respData.data
-          const asyncRoutes = data.asyncRoutes
-          constantRoutes = data.constantRoutes
-          asyncRoutes.forEach(function(item, index) {
-            if (item.component === 'Layout') {
-              item.component = Layout
-            }
-          })
-          constantRoutes.forEach(function(item, index) {
-            if (item.component === 'Layout') {
-              item.component = Layout
-            }
-          })
-          accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-          commit('SET_ROUTES', constantRoutes.concat(accessedRoutes))
-        }
-      }).catch(error => {
-        console.error(error)
-      })
-      resolve(accessedRoutes)
+      let accessedRoutes
+      if (roles.includes('admin')) {
+        accessedRoutes = asyncRoutes || []
+      } else {
+        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+      }
+      commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })
   }
