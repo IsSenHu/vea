@@ -137,6 +137,15 @@ export const asyncRoutes = [
     },
     children: [
       {
+        path: 'userList',
+        component: () => import('@/views/user-manage/user/index'),
+        name: 'PageUser',
+        meta: {
+          title: '用户列表',
+          roles: ['adminExclusive', 'user:list']
+        }
+      },
+      {
         path: 'permissionList',
         component: () => import('@/views/user-manage/permission/index'),
         name: 'PagePermission',
