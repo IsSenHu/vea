@@ -73,20 +73,8 @@ export const constantRoutes = [
       {
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
-      }
-    ]
-  },
-  {
-    path: '/documentation',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/documentation/index'),
-        name: 'Documentation',
-        meta: { title: '文档', icon: 'documentation', affix: true }
+        name: '仪表盘',
+        meta: { title: '仪表盘', icon: 'dashboard', affix: true }
       }
     ]
   },
@@ -114,6 +102,35 @@ export const constantRoutes = [
         component: () => import('@/views/profile/index'),
         name: 'Profile',
         meta: { title: 'Profile', icon: 'user', noCache: true }
+      }
+    ]
+  },
+  {
+    path: '/money',
+    component: Layout,
+    redirect: '/money/index',
+    alwaysShow: true, // will always show the root menu
+    name: 'moneyManage',
+    meta: {
+      title: '记账',
+      icon: 'money'
+    },
+    children: [
+      {
+        path: 'incomeList',
+        component: () => import('@/views/money/income/index'),
+        name: 'pageIncome',
+        meta: {
+          title: '收入'
+        }
+      },
+      {
+        path: 'consumptionList',
+        component: () => import('@/views/money/consumption/index'),
+        name: 'pageConsumption',
+        meta: {
+          title: '消费'
+        }
       }
     ]
   }
