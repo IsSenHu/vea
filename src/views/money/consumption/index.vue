@@ -61,7 +61,7 @@
       </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.number" @pagination="getList" />
-    <el-dialog :visible.sync="dialogVisibleForItems" title="消费明细">
+    <el-dialog :visible.sync="dialogVisibleForItems" title="消费明细" :before-close="handleClose">
       <div class="filter-container">
         <el-button class="filter-item" type="primary" @click="handleAddItem">新增明细</el-button>
       </div>
@@ -235,7 +235,8 @@ export default {
       dialogVisibleForItems: false,
       dialogFormVisible: false,
       dialogStatus: '',
-      dialogPvVisible: false
+      dialogPvVisible: false,
+      ifEdited: false
     }
   },
   computed: {
@@ -244,6 +245,13 @@ export default {
     this.getList()
   },
   methods: {
+    handleClose() {
+      this.dialogVisibleForItems = false
+      if (this.ifEdited) {
+        this.getList()
+      }
+      this.ifEdited = false
+    },
     showItems(row) {
       this.listLoadingForItems = true
       this.listForItems = Object.assign({}, defaultItems)
@@ -352,6 +360,7 @@ export default {
               this.listLoadingForItems = true
               this.listForItems = this.listForItems.filter(item => item.id !== respJson.data.id)
               this.listLoadingForItems = false
+              this.ifEdited = true
             }
           })
         })
@@ -440,6 +449,7 @@ export default {
             this.listForItems.push(respJson.data)
             this.listLoadingForItems = false
             this.showSuccessForItem(respJson.data)
+            this.ifEdited = true
           }
         })
       } else {
@@ -451,6 +461,7 @@ export default {
             this.listForItems.push(respJson.data)
             this.listLoadingForItems = false
             this.showSuccessForItem(respJson.data)
+            this.ifEdited = true
           }
         })
       }
