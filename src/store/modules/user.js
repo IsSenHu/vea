@@ -1,6 +1,6 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
-import { Power } from '@/utils/HttpUtils'
+import { Power, refreshSettings } from '@/utils/HttpUtils'
 
 const state = {
   token: getToken(),
@@ -70,6 +70,7 @@ const actions = {
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         commit('SET_INTRODUCTION', introduction)
+        refreshSettings(new Date())
         resolve(info)
       } else {
         reject('Verification failed, please Login again.')

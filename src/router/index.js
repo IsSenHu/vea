@@ -92,6 +92,46 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/article',
+    component: Layout,
+    redirect: '/article',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/article/index'),
+        name: '文章列表',
+        meta: { title: '文章列表', icon: 'documentation', noCache: true }
+      },
+      {
+        path: 'edit',
+        component: () => import('@/views/article/edit'),
+        name: '编辑文章',
+        hidden: true,
+        meta: { title: '编辑文章', noCache: true }
+      },
+      {
+        path: 'look',
+        component: () => import('@/views/article/look'),
+        name: '查看文章',
+        hidden: true,
+        meta: { title: '查看文章', noCache: true }
+      }
+    ]
+  },
+  {
+    path: '/config',
+    component: Layout,
+    redirect: '/config/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/config/index'),
+        name: '设置中心',
+        meta: { title: '设置中心', icon: 'example', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/profile',
     component: Layout,
     redirect: '/profile/index',
