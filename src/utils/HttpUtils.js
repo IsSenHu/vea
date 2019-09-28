@@ -2,7 +2,7 @@ import axios from 'axios'
 import { getToken } from '@/utils/auth'
 
 export const Power = axios.create({
-  baseURL: 'http://127.0.0.1:8080',
+  baseURL: 'http://118.24.38.46:8080',
   withCredentials: false
 })
 
