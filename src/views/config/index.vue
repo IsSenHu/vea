@@ -77,7 +77,7 @@
 <script>
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
-import { request } from '@/utils/HttpUtils'
+import { request, refreshSettings } from '@/utils/HttpUtils'
 
 const defaultConfig = {
   id: null,
@@ -211,6 +211,7 @@ export default {
                 type: 'success'
               })
               this.getList()
+              refreshSettings(new Date())
             }
           })
         })
@@ -235,6 +236,7 @@ export default {
           if (code === 0) {
             this.showSuccess()
             this.getList()
+            refreshSettings(new Date())
           }
         })
       } else {
@@ -244,6 +246,7 @@ export default {
           if (code === 0) {
             this.showSuccess()
             this.getList()
+            refreshSettings(new Date())
           }
         })
       }

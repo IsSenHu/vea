@@ -87,7 +87,7 @@ export default {
           type: null
         }
       },
-      types: getSettings().ARTICLE
+      types: getSettings().ARTICLE ? getSettings().ARTICLE : []
     }
   },
   computed: {

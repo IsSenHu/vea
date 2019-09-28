@@ -44,7 +44,7 @@ export default {
       html: '',
       type: null,
       dialogVisible: true,
-      types: getSettings().ARTICLE
+      types: getSettings().ARTICLE ? getSettings().ARTICLE : []
     }
   },
   computed: {
