@@ -119,6 +119,27 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/health',
+    component: Layout,
+    redirect: '/health/index',
+    alwaysShow: true, // will always show the root menu
+    name: 'healthManage',
+    meta: {
+      title: '健康管理',
+      icon: 'people'
+    },
+    children: [
+      {
+        path: 'sleepList',
+        component: () => import('@/views/health/sleep/index'),
+        name: 'pageSleep',
+        meta: {
+          title: '睡眠'
+        }
+      }
+    ]
+  },
+  {
     path: '/config',
     component: Layout,
     redirect: '/config/index',
@@ -189,7 +210,7 @@ export const asyncRoutes = [
     name: 'userManage',
     meta: {
       title: '用户管理',
-      icon: 'peoples',
+      icon: 'user',
       roles: ['adminExclusive', 'role:list', 'permission:list']
     },
     children: [

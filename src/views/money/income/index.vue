@@ -40,7 +40,7 @@
       </el-table-column>
       <el-table-column label="收入" prop="income" sortable="custom" align="center" :class-name="getSortClass('income')">
         <template slot-scope="scope">
-          <span>{{ scope.row.config }}</span>
+          <span>{{ scope.row.sleep }}</span>
         </template>
       </el-table-column>
       <el-table-column label="收入时间" prop="time" sortable="custom" align="center" :class-name="getSortClass('time')">
