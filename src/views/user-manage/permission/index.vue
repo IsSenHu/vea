@@ -51,8 +51,7 @@
 <script>
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { Power } from '@/utils/HttpUtils'
-import { getToken } from '@/utils/auth'
+import { request } from '@/utils/HttpUtils'
 
 export default {
   name: 'ComplexTable',
@@ -86,14 +85,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      Power({
-        headers: {
-          'Authorization': getToken()
-        },
-        method: 'post',
-        url: '/api/permission/page',
-        data: this.listQuery
-      }).then(resp => {
+      request('post', '/api/permission/page', this.listQuery, resp => {
         const respJson = resp.data
         const { code } = respJson
         if (code === 0) {
@@ -103,8 +95,6 @@ export default {
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
-      }).catch(error => {
-        console.error(error)
       })
     },
     handleFilter() {

@@ -25,14 +25,27 @@
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/profile/index">
-            <el-dropdown-item>Profile</el-dropdown-item>
+            <el-dropdown-item>个人主页</el-dropdown-item>
           </router-link>
           <el-dropdown-item divided>
-            <span style="display:block;" @click="logout">Log Out</span>
+            <span style="display:block;" @click="logout">注销</span>
+          </el-dropdown-item>
+          <el-dropdown-item divided>
+            <span style="display:block;" @click="lock">锁定</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <el-dialog title="帐号锁定" :before-close="handleClose" :show-close="showClose" :visible.sync="dialogFormVisible">
+      <el-form>
+        <el-form-item label="密码">
+          <el-input v-model="password" placeholder="请输入用户密码解锁" autocomplete="off" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="unlock">解锁</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -44,6 +57,7 @@ import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
+import { request } from '@/utils/HttpUtils'
 
 export default {
   components: {
@@ -54,12 +68,28 @@ export default {
     SizeSelect,
     Search
   },
+  data() {
+    return {
+      dialogFormVisible: false,
+      password: '',
+      showClose: false
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
       'avatar',
       'device'
     ])
+  },
+  created() {
+    request('post', '/auth/isLocked', null, resp => {
+      const respJson = resp.data
+      const { code, data } = respJson
+      if (code === 0 && data) {
+        this.dialogFormVisible = true
+      }
+    })
   },
   methods: {
     toggleSideBar() {
@@ -68,6 +98,37 @@ export default {
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+    handleClose(done) {},
+    async lock() {
+      request('post', '/auth/lock', null, resp => {
+        const respJson = resp.data
+        const { code } = respJson
+        if (code === 0) {
+          this.dialogFormVisible = true
+        }
+      })
+    },
+    unlock() {
+      request('post', '/auth/unlock/' + this.password, null, resp => {
+        const respJson = resp.data
+        const { code } = respJson
+        if (code === 0) {
+          this.dialogFormVisible = false
+        } if (code === 10003) {
+          this.$notify({
+            title: '提示',
+            message: '密码错误',
+            type: 'warning'
+          })
+        } else {
+          this.$notify({
+            title: '提示',
+            message: '解锁成功',
+            type: 'success'
+          })
+        }
+      })
     }
   }
 }

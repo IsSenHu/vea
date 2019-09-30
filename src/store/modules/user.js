@@ -1,6 +1,6 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
-import { Power, refreshSettings } from '@/utils/HttpUtils'
+import { Power, request, refreshSettings } from '@/utils/HttpUtils'
 
 const state = {
   token: getToken(),
@@ -79,15 +79,9 @@ const actions = {
   },
 
   // user logout
-  logout({ commit, state }) {
+  logout({ commit }) {
     return new Promise((resolve, reject) => {
-      Power({
-        headers: {
-          'Authorization': getToken()
-        },
-        method: 'post',
-        url: '/auth/logout'
-      }).then(resp => {
+      request('post', '/auth/logout', null, resp => {
         const respJson = resp.data
         const { code } = respJson
         if (code === 0) {
@@ -102,8 +96,6 @@ const actions = {
         } else {
           reject(respJson.error)
         }
-      }).catch(error => {
-        reject(error)
       })
     })
   },

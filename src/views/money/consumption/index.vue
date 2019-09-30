@@ -21,6 +21,7 @@
         查询
       </el-button>
       <el-button class="filter-item" type="primary" @click="handleAddConsumption">新增消费</el-button>
+      <el-button type="success" class="filter-item" @click="statistics">简单统计</el-button>
     </div>
 
     <el-table
@@ -245,6 +246,18 @@ export default {
     this.getList()
   },
   methods: {
+    statistics() {
+      request('post', '/api/consumption/statistics/REN_MIN_BI', this.listQuery.customParams, resp => {
+        const respJson = resp.data
+        const { code, data } = respJson
+        if (code === 0) {
+          const { totalDay, total, avgPerDay } = data
+          this.$alert(`总天数: ${totalDay} 😊 合计: ${total} 😨 平均每天: ${avgPerDay}`, '简单统计', {
+            confirmButtonText: '确定'
+          })
+        }
+      })
+    },
     handleClose() {
       this.dialogVisibleForItems = false
       if (this.ifEdited) {
