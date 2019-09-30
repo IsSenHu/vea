@@ -39,7 +39,7 @@
     <el-dialog title="帐号锁定" :before-close="handleClose" :show-close="showClose" :visible.sync="dialogFormVisible">
       <el-form>
         <el-form-item label="密码">
-          <el-input v-model="password" placeholder="请输入用户密码解锁" autocomplete="off" />
+          <el-input v-model="password" type="password" placeholder="请输入用户密码解锁" autocomplete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -110,25 +110,33 @@ export default {
       })
     },
     unlock() {
-      request('post', '/auth/unlock/' + this.password, null, resp => {
-        const respJson = resp.data
-        const { code } = respJson
-        if (code === 0) {
-          this.dialogFormVisible = false
-        } if (code === 10003) {
-          this.$notify({
-            title: '提示',
-            message: '密码错误',
-            type: 'warning'
-          })
-        } else {
-          this.$notify({
-            title: '提示',
-            message: '解锁成功',
-            type: 'success'
-          })
-        }
-      })
+      if (this.password.trim().length === 0) {
+        this.$notify({
+          title: '提示',
+          message: '请输入密码',
+          type: 'warning'
+        })
+      } else {
+        request('post', '/auth/unlock/' + this.password, null, resp => {
+          const respJson = resp.data
+          const { code } = respJson
+          if (code === 0) {
+            this.dialogFormVisible = false
+          } if (code === 10003) {
+            this.$notify({
+              title: '提示',
+              message: '密码错误',
+              type: 'warning'
+            })
+          } else {
+            this.$notify({
+              title: '提示',
+              message: '解锁成功',
+              type: 'success'
+            })
+          }
+        })
+      }
     }
   }
 }
