@@ -96,12 +96,6 @@ export default {
       options: [{
         value: 'ARTICLE',
         label: '文章类型'
-      }, {
-        value: 'BEDTIME_STATE',
-        label: '睡前状态'
-      }, {
-        value: 'DREAM_STATE',
-        label: '梦境状态'
       }],
       config: Object.assign({}, defaultConfig),
       tableKey: 0,

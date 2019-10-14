@@ -32,13 +32,13 @@ export function request(method, url, data, then) {
               const { code, data } = respJson
               if (code === 0 && !data) {
                 removeToken()
-                location.href = '/login'
+                location.href = '/#/login'
               }
             })
             .catch(error => {
               console.error(error)
               removeToken()
-              location.href = '/login'
+              location.href = '/#/login'
             })
         })
       }

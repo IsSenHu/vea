@@ -63,7 +63,7 @@ const actions = {
       if (info) {
         const { roles, name, avatar, introduction } = info
         // roles must be a non-empty array
-        if (!roles || roles.length <= 0) {
+        if (!roles) {
           reject('getInfo: roles must be a non-null array!')
         }
         commit('SET_ROLES', roles)
