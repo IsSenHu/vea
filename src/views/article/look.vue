@@ -5,14 +5,17 @@
         <H2 v-html="title" />
         <p v-html="time" />
       </div>
-      <div class="text item" v-html="html" />
+      <div id="html" class="text item" v-html="html" />
     </el-card>
   </div>
 </template>
 
 <script>
 import { request } from '@/utils/HttpUtils'
-
+import hljs from 'highlight.js'
+import 'highlight.js/styles/qtcreator_dark.css'
+// qtcreator_dark.css
+// xcode.css
 export default {
   name: 'MarkdownLook',
   data() {
@@ -36,6 +39,13 @@ export default {
             this.html = data.html
             this.title = data.title
             this.time = data.time
+            this.$nextTick(() => {
+              const blocks = document.querySelectorAll('pre code')
+              blocks.forEach((block) => {
+                block.style.fontWeight = 'bold'
+                hljs.highlightBlock(block)
+              })
+            })
           }
         })
       }

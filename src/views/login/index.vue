@@ -70,6 +70,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { Message } from 'element-ui'
 import SocialSign from './components/SocialSignin'
 
 export default {
@@ -78,14 +79,14 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('请输入正确的用户名'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('密码至少有6位'))
       } else {
         callback()
       }
@@ -93,7 +94,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -164,11 +165,12 @@ export default {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
             })
-            .catch(() => {
+            .catch(error => {
+              Message.error(error || 'Has Error')
               this.loading = false
             })
         } else {
-          console.log('error submit!!')
+          console.log('提交错误!!')
           return false
         }
       })
