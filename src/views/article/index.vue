@@ -60,7 +60,7 @@
 <script>
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
-import { request, getSettings } from '@/utils/HttpUtils'
+import { request } from '@/utils/HttpUtils'
 
 export default {
   name: 'ComplexTable',
@@ -87,7 +87,7 @@ export default {
           type: null
         }
       },
-      types: getSettings().ARTICLE ? getSettings().ARTICLE : []
+      types: this.$store.getters.selfSettings.ARTICLE ? this.$store.getters.selfSettings.ARTICLE : []
     }
   },
   computed: {
@@ -117,9 +117,7 @@ export default {
           })
           this.total = respJson.data.total
         }
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        this.listLoading = false
       })
     },
     handleFilter() {

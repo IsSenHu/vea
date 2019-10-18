@@ -2,7 +2,8 @@ import axios from 'axios'
 import { getToken, removeToken } from '@/utils/auth'
 
 export const Power = axios.create({
-  baseURL: 'http://apollo.free.idcfengye.com',
+  // baseURL: 'http://apollo.free.idcfengye.com',
+  baseURL: 'http://127.0.0.1:8080',
   withCredentials: false
 })
 
@@ -29,7 +30,7 @@ export function request(method, url, data, then) {
           .then(resp => {
             const respJson = resp.data
             const { code, data } = respJson
-            if (code === 0 && !data) {
+            if (code === 0 && data) {
               removeToken()
               location.href = '/#/login'
             }
@@ -42,19 +43,4 @@ export function request(method, url, data, then) {
       }
     })
 }
-
-export function refreshSettings(time) {
-  console.log(time)
-  request('get', '/api/config/findAll', null, resp => {
-    const respJson = resp.data
-    const { code } = respJson
-    const { data } = respJson
-    if (code === 0) {
-      localStorage.setItem('settings', JSON.stringify(data))
-    }
-  })
-}
-
-export function getSettings() {
-  return JSON.parse(localStorage.getItem('settings'))
-}
+// this.$store.getters

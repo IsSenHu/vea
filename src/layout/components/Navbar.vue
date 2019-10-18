@@ -83,13 +83,17 @@ export default {
     ])
   },
   created() {
-    request('post', '/auth/isLocked', null, resp => {
-      const respJson = resp.data
-      const { code, data } = respJson
-      if (code === 0 && data) {
-        this.dialogFormVisible = true
-      }
-    })
+    if (localStorage.getItem('justLogin')) {
+      localStorage.removeItem('justLogin')
+    } else {
+      request('post', '/auth/isLocked', null, resp => {
+        const respJson = resp.data
+        const { code, data } = respJson
+        if (code === 0 && data) {
+          this.dialogFormVisible = true
+        }
+      })
+    }
   },
   methods: {
     toggleSideBar() {

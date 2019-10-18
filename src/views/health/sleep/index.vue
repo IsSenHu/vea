@@ -146,7 +146,7 @@
 <script>
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
-import { request, getSettings } from '@/utils/HttpUtils'
+import { request } from '@/utils/HttpUtils'
 
 const defaultSleep = {
   id: null,
@@ -168,8 +168,8 @@ export default {
   },
   data() {
     return {
-      bedtimeStates: getSettings().BEDTIME_STATE ? getSettings().BEDTIME_STATE : [],
-      dreamStates: getSettings().DREAM_STATE ? getSettings().DREAM_STATE : [],
+      bedtimeStates: [],
+      dreamStates: [],
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now()
@@ -232,9 +232,7 @@ export default {
           this.list = respJson.data.items
           this.total = respJson.data.total
         }
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        this.listLoading = false
       })
     },
     handleFilter() {

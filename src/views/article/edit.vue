@@ -31,7 +31,7 @@
 
 <script>
 import MarkdownEditor from '@/components/MarkdownEditor'
-import { getSettings, request } from '@/utils/HttpUtils'
+import { request } from '@/utils/HttpUtils'
 
 export default {
   name: 'MarkdownDemo',
@@ -44,7 +44,7 @@ export default {
       html: '',
       type: null,
       dialogVisible: true,
-      types: getSettings().ARTICLE ? getSettings().ARTICLE : []
+      types: []
     }
   },
   computed: {

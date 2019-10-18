@@ -68,7 +68,7 @@
       </el-form>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogVisible=false">取消</el-button>
-        <el-button type="primary" @click="confirmIncome">提交</el-button>
+        <el-button type="primary" @click="confirm">提交</el-button>
       </div>
     </el-dialog>
   </div>
@@ -77,7 +77,7 @@
 <script>
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
-import { request, refreshSettings } from '@/utils/HttpUtils'
+import { request } from '@/utils/HttpUtils'
 
 const defaultConfig = {
   id: null,
@@ -131,9 +131,7 @@ export default {
           this.list = respJson.data.items
           this.total = respJson.data.total
         }
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        this.listLoading = false
       })
     },
     handleFilter() {
@@ -211,7 +209,6 @@ export default {
                 type: 'success'
               })
               this.getList()
-              refreshSettings(new Date())
             }
           })
         })
@@ -227,7 +224,7 @@ export default {
         type: 'success'
       })
     },
-    async confirmIncome() {
+    async confirm() {
       const isEdit = this.dialogType === 'edit'
       if (isEdit) {
         request('post', '/api/config', this.config, resp => {
@@ -236,7 +233,6 @@ export default {
           if (code === 0) {
             this.showSuccess()
             this.getList()
-            refreshSettings(new Date())
           }
         })
       } else {
@@ -246,7 +242,6 @@ export default {
           if (code === 0) {
             this.showSuccess()
             this.getList()
-            refreshSettings(new Date())
           }
         })
       }

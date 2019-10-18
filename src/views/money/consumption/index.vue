@@ -286,10 +286,9 @@ export default {
         if (code === 0) {
           this.list = respJson.data.items
           this.total = respJson.data.total
+          console.log('finish')
         }
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        this.listLoading = false
       })
     },
     handleFilter() {

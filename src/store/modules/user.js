@@ -1,13 +1,15 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
-import { Power, request, refreshSettings } from '@/utils/HttpUtils'
+import { Power, request } from '@/utils/HttpUtils'
 
 const state = {
   token: getToken(),
   name: '',
   avatar: '',
   introduction: '',
-  roles: []
+  roles: [],
+  selfSettings: {},
+  justLogin: false
 }
 
 const mutations = {
@@ -25,6 +27,9 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_SELF_SETTINGS: (state, selfSettings) => {
+    state.selfSettings = selfSettings
   }
 }
 
@@ -48,6 +53,7 @@ const actions = {
           commit('SET_TOKEN', data.token)
           setToken(data.token)
           localStorage.setItem('info', JSON.stringify(data.info))
+          localStorage.setItem('justLogin', 'yes')
           resolve()
         } else {
           reject(respJson.error)
@@ -61,7 +67,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       const info = JSON.parse(localStorage.getItem('info'))
       if (info) {
-        const { roles, name, avatar, introduction } = info
+        const { roles, name, avatar, introduction, selfConfig } = info
         // roles must be a non-empty array
         if (!roles) {
           reject('getInfo: roles must be a non-null array!')
@@ -70,7 +76,7 @@ const actions = {
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         commit('SET_INTRODUCTION', introduction)
-        refreshSettings(new Date())
+        commit('SET_SELF_SETTINGS', selfConfig)
         resolve(info)
       } else {
         reject('Verification failed, please Login again.')
