@@ -1,6 +1,7 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 import { Power, request } from '@/utils/HttpUtils'
+import { Connector } from '@/utils/WebSocketUtils'
 
 const state = {
   token: getToken(),
@@ -30,6 +31,9 @@ const mutations = {
   },
   SET_SELF_SETTINGS: (state, selfSettings) => {
     state.selfSettings = selfSettings
+  },
+  SET_JUST_LOGIN: (state, justLogin) => {
+    state.justLogin = justLogin
   }
 }
 
@@ -47,13 +51,13 @@ const actions = {
         }
       }).then(resp => {
         const respJson = resp.data
-        const { code } = respJson
-        const { data } = respJson
+        const { code, data } = respJson
         if (code === 0) {
           commit('SET_TOKEN', data.token)
+          commit('SET_JUST_LOGIN', true)
           setToken(data.token)
           localStorage.setItem('info', JSON.stringify(data.info))
-          localStorage.setItem('justLogin', 'yes')
+          Connector.connect()
           resolve()
         } else {
           reject(respJson.error)
@@ -70,7 +74,7 @@ const actions = {
         const { roles, name, avatar, introduction, selfConfig } = info
         // roles must be a non-empty array
         if (!roles) {
-          reject('getInfo: roles must be a non-null array!')
+          reject('用户必须有角色')
         }
         commit('SET_ROLES', roles)
         commit('SET_NAME', name)
@@ -96,6 +100,9 @@ const actions = {
           commit('SET_NAME', '')
           commit('SET_AVATAR', '')
           commit('SET_INTRODUCTION', '')
+          commit('SET_JUST_LOGIN', false)
+          commit('SET_SELF_SETTINGS', {})
+          Connector.disconnect()
           removeToken()
           resetRouter()
           resolve()
@@ -139,6 +146,14 @@ const actions = {
 
       resolve()
     })
+  },
+  // justLogin
+  justLogin({ commit }, justLogin) {
+    commit('SET_JUST_LOGIN', justLogin)
+  },
+  // selfSettings
+  selfSettings({ commit }, selfSettings) {
+    commit('SET_SELF_SETTINGS', selfSettings)
   }
 }
 

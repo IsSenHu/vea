@@ -44,7 +44,7 @@ export default {
       html: '',
       type: null,
       dialogVisible: true,
-      types: []
+      types: this.$store.getters.selfSettings.ARTICLE ? this.$store.getters.selfSettings.ARTICLE : []
     }
   },
   computed: {

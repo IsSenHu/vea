@@ -83,8 +83,8 @@ export default {
     ])
   },
   created() {
-    if (localStorage.getItem('justLogin')) {
-      localStorage.removeItem('justLogin')
+    if (this.$store.getters.justLogin) {
+      this.$store.dispatch('user/justLogin', false)
     } else {
       request('post', '/auth/isLocked', null, resp => {
         const respJson = resp.data

@@ -51,11 +51,6 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/web-socket',
-    component: () => import('@/views/websocket/index'),
-    hidden: true
-  },
-  {
     path: '/forYouDownload',
     component: () => import('@/views/forYouDownload/index'),
     hidden: true
