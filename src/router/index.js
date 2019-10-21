@@ -199,6 +199,19 @@ export const constantRoutes = [
         }
       }
     ]
+  },
+  {
+    path: '/function',
+    component: Layout,
+    redirect: '/function',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/function/index'),
+        name: 'Function',
+        meta: { title: '功能脚本执行', icon: 'skill', noCache: true }
+      }
+    ]
   }
 ]
 

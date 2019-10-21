@@ -9,16 +9,16 @@ const headers = {
 }
 
 const subscribes = {
-  test: {
+  createConsumption: {
     queue: '/user/queue/router',
     callback(msg) {
       if (msg.command === 'MESSAGE') {
         const { body } = msg
-        console.log(body)
+        alert(body)
       }
     },
     send(message) {
-      stompClient.send('/app/test', headers, message)
+      stompClient.send('/app/consumption', headers, message)
     }
   }
 }
@@ -28,11 +28,12 @@ export const Connector = {
     // 设置头信息
     headers.authorization = getToken()
     // 建立连接对象
-    socket = new SockJS('http://127.0.0.1:8101/pushServer')
+    socket = new SockJS('http://apollo.free.idcfengye.com/socket')
     // 获取STOMP子协议的客户端对象
     stompClient = Stomp.over(socket)
     // 向服务器发起websocket连接
     stompClient.connect(headers, () => {
+      console.log('连接成功')
       for (const key in subscribes) {
         const subscribe = subscribes[key]
         stompClient.subscribe(subscribe.queue, subscribe.callback, headers)
