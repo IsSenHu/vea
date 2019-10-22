@@ -164,6 +164,8 @@ export default {
             .then(() => {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
+              console.log('here')
+              this.$emit('already_login')
             })
             .catch(error => {
               Message.error(error || 'Has Error')

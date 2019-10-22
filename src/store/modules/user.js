@@ -102,10 +102,10 @@ const actions = {
           commit('SET_INTRODUCTION', '')
           commit('SET_JUST_LOGIN', false)
           commit('SET_SELF_SETTINGS', {})
-          Connector.disconnect()
           removeToken()
           resetRouter()
           resolve()
+          Connector.disconnect()
         } else {
           reject(respJson.error)
         }
