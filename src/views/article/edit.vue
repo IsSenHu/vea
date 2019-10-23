@@ -14,9 +14,18 @@
       <div class="filter-container">
         <el-input v-model="title" placeholder="请输入文章标题" />
       </div>
+      <div class="filter-container">
+        <el-button type="warning" icon="el-icon-upload" @click="toUpload">
+          上传文章图片
+        </el-button>
+      </div>
       <markdown-editor ref="markdownEditor" v-model="content" :options="{hideModeSwitch:true, previewStyle:'tab'}" height="500px" />
     </div>
-
+    <el-dialog title="上传文章图片" :visible.sync="uploadVisible" width="25%">
+      <el-upload class="uploadfile" action="" :http-request="uploadFileMethod" :show-file-list="false" multiple>
+        <el-button icon="el-icon-upload" />
+      </el-upload>
+    </el-dialog>
     <el-button style="margin-top:80px;" type="primary" icon="el-icon-check" @click="save(null)">
       保存
     </el-button>
@@ -38,6 +47,7 @@ export default {
   components: { MarkdownEditor },
   data() {
     return {
+      uploadVisible: false,
       id: null,
       title: '',
       content: '',
@@ -53,6 +63,33 @@ export default {
     this.showEdit()
   },
   methods: {
+    toUpload() {
+      this.uploadVisible = true
+    },
+    uploadFileMethod(param) {
+      this.uploadVisible = false
+      const fileObject = param.file
+      const formData = new FormData()
+      formData.append('file', fileObject)
+      request('post', '/api/oss/uploadForArticle', formData, resp => {
+        const respJson = resp.data
+        const { code, data } = respJson
+        if (code === 0) {
+          this.$message({
+            message: '上传成功，图片链接:' + data,
+            type: 'success'
+          })
+        } else {
+          this.$notify({
+            title: '上传失败',
+            dangerouslyUseHTMLString: true,
+            message: `
+          `,
+            type: 'warning'
+          })
+        }
+      })
+    },
     showEdit() {
       const id = localStorage.getItem('currentEditArticleId')
       if (id) {
