@@ -3,8 +3,6 @@
     <router-view />
   </div>
 </template>
-
-import { Connector } from '@/utils/WebSocketUtils'
 <script>
 
 export default {

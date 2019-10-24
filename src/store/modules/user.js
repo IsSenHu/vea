@@ -10,6 +10,7 @@ const state = {
   introduction: '',
   roles: [],
   selfSettings: {},
+  businessSettings: {},
   justLogin: false
 }
 
@@ -32,12 +33,15 @@ const mutations = {
   SET_SELF_SETTINGS: (state, selfSettings) => {
     state.selfSettings = selfSettings
   },
+  SET_BUSINESS_SETTINGS: (state, businessSettings) => {
+    state.businessSettings = businessSettings
+  },
   SET_JUST_LOGIN: (state, justLogin) => {
     state.justLogin = justLogin
   }
 }
 
-const actions = {
+export const actions = {
   // user login
   login({ commit }, userInfo) {
     const { username, password } = userInfo
@@ -71,7 +75,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       const info = JSON.parse(localStorage.getItem('info'))
       if (info) {
-        const { roles, name, avatar, introduction, selfConfig } = info
+        const { roles, name, avatar, introduction, selfConfig, businessSettings } = info
         // roles must be a non-empty array
         if (!roles) {
           reject('用户必须有角色')
@@ -81,6 +85,7 @@ const actions = {
         commit('SET_AVATAR', avatar)
         commit('SET_INTRODUCTION', introduction)
         commit('SET_SELF_SETTINGS', selfConfig)
+        commit('SET_BUSINESS_SETTINGS', businessSettings)
         resolve(info)
       } else {
         reject('Verification failed, please Login again.')
@@ -102,6 +107,7 @@ const actions = {
           commit('SET_INTRODUCTION', '')
           commit('SET_JUST_LOGIN', false)
           commit('SET_SELF_SETTINGS', {})
+          commit('SET_BUSINESS_SETTINGS', {})
           removeToken()
           resetRouter()
           resolve()
@@ -154,6 +160,10 @@ const actions = {
   // selfSettings
   selfSettings({ commit }, selfSettings) {
     commit('SET_SELF_SETTINGS', selfSettings)
+  },
+  // businessSettings
+  businessSettings({ commit }, businessSettings) {
+    commit('SET_BUSINESS_SETTINGS', businessSettings)
   }
 }
 
