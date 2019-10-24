@@ -58,6 +58,7 @@ import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import { request } from '@/utils/HttpUtils'
+import { Connector } from '@/utils/WebSocketUtils'
 
 export default {
   components: {
@@ -93,6 +94,9 @@ export default {
           this.dialogFormVisible = true
         }
       })
+    }
+    if (!Connector.connected) {
+      Connector.connect()
     }
   },
   methods: {

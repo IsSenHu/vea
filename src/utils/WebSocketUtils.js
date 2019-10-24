@@ -5,6 +5,7 @@ import Stomp from 'stompjs'
 
 let stompClient = null
 let socket = null
+let connected = false
 
 const subscribes = {
   createConsumption: {
@@ -93,6 +94,7 @@ export const Connector = {
       authorization: getToken()
     }, () => {
       console.log('连接成功')
+      connected = true
       for (const key in subscribes) {
         const subscribe = subscribes[key]
         const headers = {
@@ -129,7 +131,9 @@ export const Connector = {
         socket = null
         stompClient = null
       }, headers)
+      connected = false
     }
   },
-  subscribes: subscribes
+  subscribes: subscribes,
+  connected: connected
 }

@@ -61,7 +61,6 @@ export const actions = {
           commit('SET_JUST_LOGIN', true)
           setToken(data.token)
           localStorage.setItem('info', JSON.stringify(data.info))
-          Connector.connect()
           resolve()
         } else {
           reject(respJson.error)
