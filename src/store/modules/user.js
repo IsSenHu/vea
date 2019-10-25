@@ -74,7 +74,7 @@ export const actions = {
     return new Promise((resolve, reject) => {
       const info = JSON.parse(localStorage.getItem('info'))
       if (info) {
-        const { roles, name, avatar, introduction, selfConfig, businessSettings } = info
+        const { roles, name, avatar, introduction, selfConfig, businessSetting } = info
         // roles must be a non-empty array
         if (!roles) {
           reject('用户必须有角色')
@@ -84,7 +84,7 @@ export const actions = {
         commit('SET_AVATAR', avatar)
         commit('SET_INTRODUCTION', introduction)
         commit('SET_SELF_SETTINGS', selfConfig)
-        commit('SET_BUSINESS_SETTINGS', businessSettings)
+        commit('SET_BUSINESS_SETTINGS', businessSetting)
         resolve(info)
       } else {
         reject('Verification failed, please Login again.')

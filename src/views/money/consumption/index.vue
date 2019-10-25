@@ -90,6 +90,11 @@
             <span>{{ scope.row.currency }}</span>
           </template>
         </el-table-column>
+        <el-table-column label="消费类型" align="center">
+          <template slot-scope="scope">
+            <span>{{ showTypeName(scope.row.type) }}</span>
+          </template>
+        </el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="handleEditItem(scope)">编辑</el-button>
@@ -110,6 +115,16 @@
             type="textarea"
             placeholder="说明"
           />
+        </el-form-item>
+        <el-form-item label="消费类型">
+          <el-select v-model="item.type" placeholder="请选择">
+            <el-option
+              v-for="i in consumptionTypes"
+              :key="i.code"
+              :label="i.name"
+              :value="i.code"
+            />
+          </el-select>
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
@@ -145,6 +160,25 @@
         <el-button type="primary" @click="confirmConsumption">提交</el-button>
       </div>
     </el-dialog>
+    <el-dialog :visible.sync="simpleStatisticsDialogVisible" title="简单统计">
+      <el-card class="box-card">
+        <p class="text item">
+          <el-tag>😚 总天数: {{ totalDay }}</el-tag>
+        </p>
+        <p class="text item">
+          <el-tag>😊 合计: {{ totalByStatistics }}</el-tag>
+        </p>
+        <p class="text item">
+          <el-tag>😨 平均每天: {{ avgPerDay }}</el-tag>
+        </p>
+        <p class="text item">
+          <el-tag>👇 分类</el-tag>
+        </p>
+        <p v-for="o in byType" :key="o.type" class="text item">
+          <el-tag type="info">{{ o.type + ": " + o.total }}</el-tag>
+        </p>
+      </el-card>
+    </el-dialog>
   </div>
 </template>
 
@@ -164,7 +198,8 @@ const defaultItem = {
   id: null,
   consumptionId: null,
   money: 0,
-  description: ''
+  description: '',
+  type: null
 }
 
 const defaultItems = []
@@ -177,6 +212,11 @@ export default {
   },
   data() {
     return {
+      simpleStatisticsDialogVisible: false,
+      totalDay: null,
+      totalByStatistics: '',
+      avgPerDay: '',
+      byType: {},
       options: [{
         value: 'REN_MIN_BI',
         label: '人民币'
@@ -237,7 +277,8 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       dialogPvVisible: false,
-      ifEdited: false
+      ifEdited: false,
+      consumptionTypes: this.$store.getters.businessSettings.consumptionTypes ? this.$store.getters.businessSettings.consumptionTypes : []
     }
   },
   computed: {
@@ -246,15 +287,40 @@ export default {
     this.getList()
   },
   methods: {
+    showTypeName(code) {
+      const businessSettings = this.$store.getters.businessSettings
+      if (businessSettings && code) {
+        const { consumptionTypes } = businessSettings
+        if (consumptionTypes) {
+          for (let i = 0; i < consumptionTypes.length; i++) {
+            const consumptionType = consumptionTypes[i]
+            if (consumptionType.code === code) {
+              return consumptionType.name
+            }
+          }
+        }
+      }
+      return null
+    },
     statistics() {
       request('post', '/api/consumption/statistics/REN_MIN_BI', this.listQuery.customParams, resp => {
         const respJson = resp.data
         const { code, data } = respJson
         if (code === 0) {
-          const { totalDay, total, avgPerDay } = data
-          this.$alert(`总天数: ${totalDay} 😊 合计: ${total} 😨 平均每天: ${avgPerDay}`, '简单统计', {
-            confirmButtonText: '确定'
+          const { totalDay, total, avgPerDay, byType } = data
+          this.totalDay = totalDay
+          this.totalByStatistics = total
+          this.avgPerDay = avgPerDay
+          this.byType = []
+          this.$store.getters.businessSettings.consumptionTypes.forEach(type => {
+            if (byType[type.code]) {
+              this.byType.push({
+                type: type.name,
+                total: byType[type.code]
+              })
+            }
           })
+          this.simpleStatisticsDialogVisible = true
         }
       })
     },
@@ -286,7 +352,6 @@ export default {
         if (code === 0) {
           this.list = respJson.data.items
           this.total = respJson.data.total
-          console.log('finish')
         }
         this.listLoading = false
       })
@@ -352,6 +417,7 @@ export default {
           this.item.id = respJson.data.id
           this.item.money = respJson.data.money
           this.item.description = respJson.data.description
+          this.item.type = respJson.data.type
           this.dialogTypeForItem = 'edit'
           this.dialogVisibleForItem = true
         }

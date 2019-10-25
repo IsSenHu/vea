@@ -21,6 +21,7 @@
         查询
       </el-button>
       <el-button class="filter-item" type="primary" @click="handleAddIncome">新增收入</el-button>
+      <el-button type="success" class="filter-item" @click="statistics">简单统计</el-button>
     </div>
 
     <el-table
@@ -51,6 +52,11 @@
       <el-table-column label="说明" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.description }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="收入渠道" align="center">
+        <template slot-scope="scope">
+          <span>{{ showChannelName(scope.row.channel) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="货币单位" align="center">
@@ -101,11 +107,34 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="收入渠道">
+          <el-select v-model="income.channel" placeholder="请选择">
+            <el-option
+              v-for="i in incomeChannels"
+              :key="i.code"
+              :label="i.name"
+              :value="i.code"
+            />
+          </el-select>
+        </el-form-item>
       </el-form>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogVisible=false">取消</el-button>
         <el-button type="primary" @click="confirmIncome">提交</el-button>
       </div>
+    </el-dialog>
+    <el-dialog :visible.sync="simpleStatisticsDialogVisible" title="简单统计">
+      <el-card class="box-card">
+        <p class="text item">
+          <el-tag>😊 合计: {{ totalByStatistics }}</el-tag>
+        </p>
+        <p class="text item">
+          <el-tag>👇 分类</el-tag>
+        </p>
+        <p v-for="o in byChannel" :key="o.channel" class="text item">
+          <el-tag type="info">{{ o.channel + ": " + o.total }}</el-tag>
+        </p>
+      </el-card>
     </el-dialog>
   </div>
 </template>
@@ -120,7 +149,8 @@ const defaultIncome = {
   income: 0,
   time: null,
   description: '',
-  currency: null
+  currency: null,
+  channel: null
 }
 
 export default {
@@ -131,10 +161,12 @@ export default {
   },
   data() {
     return {
+      simpleStatisticsDialogVisible: false,
       options: [{
         value: 'REN_MIN_BI',
         label: '人民币'
       }],
+      incomeChannels: this.$store.getters.businessSettings.incomeChannels ? this.$store.getters.businessSettings.incomeChannels : [],
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now()
@@ -183,7 +215,9 @@ export default {
       dialogVisible: false,
       dialogFormVisible: false,
       dialogStatus: '',
-      dialogPvVisible: false
+      dialogPvVisible: false,
+      totalByStatistics: '',
+      byChannel: []
     }
   },
   computed: {
@@ -192,6 +226,41 @@ export default {
     this.getList()
   },
   methods: {
+    showChannelName(code) {
+      const businessSettings = this.$store.getters.businessSettings
+      if (businessSettings && code) {
+        const { incomeChannels } = businessSettings
+        if (incomeChannels) {
+          for (let i = 0; i < incomeChannels.length; i++) {
+            const incomeChannel = incomeChannels[i]
+            if (incomeChannel.code === code) {
+              return incomeChannel.name
+            }
+          }
+        }
+      }
+      return null
+    },
+    statistics() {
+      request('post', '/api/income/statistics/REN_MIN_BI', this.listQuery.customParams, resp => {
+        const respJson = resp.data
+        const { code, data } = respJson
+        if (code === 0) {
+          const { total, byChannel } = data
+          this.totalByStatistics = total
+          this.byChannel = []
+          this.$store.getters.businessSettings.incomeChannels.forEach(channel => {
+            if (byChannel[channel.code]) {
+              this.byChannel.push({
+                channel: channel.name,
+                total: byChannel[channel.code]
+              })
+            }
+          })
+          this.simpleStatisticsDialogVisible = true
+        }
+      })
+    },
     getList() {
       this.listLoading = true
       request('post', '/api/income/page', this.listQuery, resp => {
@@ -265,6 +334,7 @@ export default {
           this.income.currency = respJson.data.currency
           this.income.time = respJson.data.time
           this.income.income = respJson.data.income
+          this.income.channel = respJson.data.channel
         }
       })
     },
