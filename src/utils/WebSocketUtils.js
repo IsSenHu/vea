@@ -12,10 +12,10 @@ const subscribes = {
     queue: '/user/queue/router',
     callback(msg) {
       if (msg.command === 'MESSAGE') {
-        const { body } = msg
-        alert(body)
+        subscribes.createConsumption.realCallback(msg)
       }
     },
+    realCallback(msg) {},
     send(message) {
       const headers = {
         authorization: getToken()
