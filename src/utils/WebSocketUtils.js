@@ -9,7 +9,7 @@ let connected = false
 
 const subscribes = {
   createConsumption: {
-    queue: '/user/queue/router',
+    queue: '/user/queue/consumption',
     callback(msg) {
       if (msg.command === 'MESSAGE') {
         subscribes.createConsumption.realCallback(msg)
@@ -26,6 +26,28 @@ const subscribes = {
         })
       } else {
         stompClient.send('/app/consumption', headers, message)
+      }
+    },
+    subId: null
+  },
+  createIncome: {
+    queue: '/user/queue/income',
+    callback(msg) {
+      if (msg.command === 'MESSAGE') {
+        subscribes.createIncome.realCallback(msg)
+      }
+    },
+    realCallback(msg) {},
+    send(message) {
+      const headers = {
+        authorization: getToken()
+      }
+      if (stompClient == null || socket == null) {
+        Connector.connect(() => {
+          stompClient.send('/app/income', headers, message)
+        })
+      } else {
+        stompClient.send('/app/income', headers, message)
       }
     },
     subId: null

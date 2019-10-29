@@ -203,13 +203,25 @@ export const constantRoutes = [
   {
     path: '/function',
     component: Layout,
-    redirect: '/function',
+    redirect: '/function/index',
+    alwaysShow: true, // will always show the root menu
+    name: 'function',
+    meta: {
+      title: '引导操作',
+      icon: 'skill'
+    },
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/function/index'),
-        name: 'Function',
-        meta: { title: '功能脚本执行', icon: 'skill', noCache: true }
+        path: 'createConsumption',
+        component: () => import('@/views/function/createConsumption'),
+        name: 'CreateConsumption',
+        meta: { title: '新增消费', noCache: true }
+      },
+      {
+        path: 'createIncome',
+        component: () => import('@/views/function/createIncome'),
+        name: 'CreateIncome',
+        meta: { title: '新增收入', noCache: true }
       }
     ]
   }
