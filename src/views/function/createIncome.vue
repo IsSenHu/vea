@@ -50,7 +50,7 @@ export default {
       } else if (nextCommand === 'SET_DESC') {
         this.messages.push({
           id: ++this.idGen,
-          message: '😊 请输入消费说明 >>>',
+          message: '😊 请输入收入说明 >>>',
           self: false
         })
         this.nextCommand = nextCommand

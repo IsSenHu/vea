@@ -22,7 +22,7 @@ export default {
       messages: [
         {
           id: 0,
-          message: '😊 请输入日期 >>>',
+          message: '😊 请输入时间 >>>',
           self: false
         }
       ]
@@ -70,7 +70,7 @@ export default {
         })
         this.messages.push({
           id: ++this.idGen,
-          message: '😊 请输入日期 >>>',
+          message: '😊 请输入时间 >>>',
           self: false
         })
         this.nextConsumptionCommand = 'SET_TIME'
@@ -82,7 +82,7 @@ export default {
         })
         this.messages.push({
           id: ++this.idGen,
-          message: '😊 请输入日期 >>>',
+          message: '😊 请输入时间 >>>',
           self: false
         })
         this.nextConsumptionCommand = 'SET_TIME'
