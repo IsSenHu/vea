@@ -65,6 +65,14 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="自定义">
+          <el-input
+            v-model="config.customInfo"
+            type="textarea"
+            :autosize="{ minRows: 4, maxRows: 10}"
+            placeholder="请输入内容"
+          />
+        </el-form-item>
       </el-form>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogVisible=false">取消</el-button>
@@ -82,7 +90,8 @@ import { request } from '@/utils/HttpUtils'
 const defaultConfig = {
   id: null,
   name: '',
-  type: null
+  type: null,
+  customInfo: null
 }
 
 export default {
@@ -96,6 +105,9 @@ export default {
       options: [{
         value: 'ARTICLE',
         label: '文章类型'
+      }, {
+        value: 'EMAIL',
+        label: '邮箱安全配置'
       }],
       config: Object.assign({}, defaultConfig),
       tableKey: 0,
@@ -181,6 +193,7 @@ export default {
           this.config.id = respJson.data.id
           this.config.name = respJson.data.name
           this.config.type = respJson.data.configType
+          this.config.customInfo = JSON.stringify(respJson.data.customInfo)
         }
       })
     },
@@ -226,6 +239,7 @@ export default {
     },
     async confirm() {
       const isEdit = this.dialogType === 'edit'
+      this.config.customInfo = JSON.parse(this.config.customInfo)
       if (isEdit) {
         request('post', '/api/config', this.config, resp => {
           const respJson = resp.data

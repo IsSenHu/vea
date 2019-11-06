@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-card class="box-card">
+    <el-card class="box-card-function">
       <h4 style="color: red">提示:输入 (finish) 或者 (cancel) 结束此次会话流程</h4>
       <p v-for="{ id, message, self } in messages" :key="id" :class="self ? 'self' : 'system'">
         {{ message }}
@@ -125,7 +125,7 @@ export default {
 }
 </script>
 <style>
-  .box-card {
+  .box-card-function {
     height: 500px;
     overflow: scroll;
   }
