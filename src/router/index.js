@@ -158,6 +158,19 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/email',
+    component: Layout,
+    redirect: '/email/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/email/index'),
+        name: '电子邮件',
+        meta: { title: '电子邮件', icon: 'email', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/profile',
     component: Layout,
     redirect: '/profile/index',
