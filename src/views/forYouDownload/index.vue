@@ -10,7 +10,8 @@
     </el-card>
   </div>
 </template>
-<script>import { request } from '@/utils/HttpUtils'
+<script>
+import { request } from '@/utils/HttpUtils'
 export default {
   name: 'ForYouDownload',
   methods: {
