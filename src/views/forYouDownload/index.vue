@@ -17,7 +17,9 @@ export default {
     download() {
       request('get', 'api/oss/oss-cn-chengdu.aliyuncs.com/our-stories/86400/第一章到第八章.rar', null, resp => {
         const url = resp.data
-        location.href = url
+        if (url) {
+          location.href = url
+        }
       })
     }
   }
