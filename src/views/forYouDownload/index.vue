@@ -12,7 +12,7 @@
 </template>
 <script>import { request } from '@/utils/HttpUtils'
 export default {
-  name: 'WebSocket',
+  name: 'ForYouDownload',
   methods: {
     download() {
       request('get', 'api/oss/oss-cn-chengdu.aliyuncs.com/our-stories/86400/第一章到第八章.rar', null, resp => {
