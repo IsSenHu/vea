@@ -69,13 +69,13 @@
           <H2>
             {{ email.subject }}
           </H2>
-          <p>
+          <p v-if="!isHtml">
             {{ email.from }}
           </p>
-          <p>
+          <p v-if="!isHtml">
             {{ email.to }}
           </p>
-          <p v-if="email.cc !== ''">
+          <p v-if="email.cc !== '' && !isHtml">
             {{ email.cc }}
           </p>
         </div>
@@ -102,6 +102,7 @@ export default {
       title: '更新邮箱',
       titleLook: '邮件',
       options: this.$store.getters.selfSettings.EMAIL ? this.$store.getters.selfSettings.EMAIL : [],
+      isHtml: false,
       email: {
         id: null,
         subject: '',
@@ -150,6 +151,7 @@ export default {
         if (respJson.data.cc && respJson.data.cc.length > 0) {
           this.email.cc = '抄送: ' + respJson.data.cc
         }
+        this.isHtml = respJson.data.isHtml
         this.dialogVisibleLook = true
       })
     },
