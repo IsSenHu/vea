@@ -134,7 +134,7 @@ import { fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { Power } from '@/utils/HttpUtils'
+import { Auth } from '@/utils/HttpUtils'
 import { getToken } from '@/utils/auth'
 
 const calendarTypeOptions = [
@@ -217,7 +217,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      Power({
+      Auth({
         headers: {
           'Authorization': getToken()
         },

@@ -171,6 +171,7 @@ export default {
               Message.error(error || 'Has Error')
               this.loading = false
             })
+          return true
         } else {
           console.log('提交错误!!')
           return false

@@ -31,8 +31,8 @@
         </template>
       </el-table-column>
       <el-table-column label="文章标题" align="center">
-        <template slot-scope="{row}">
-          <span class="link-type" @click="look(row)">{{ row.title }}</span>
+        <template slot-scope="scope">
+          <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
       <el-table-column label="发布时间" align="center">
@@ -75,7 +75,7 @@
           <el-input v-model="blog.introduction" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="介绍" />
         </el-form-item>
         <el-form-item label="分类">
-          <el-select v-model="category" filterable allow-create default-first-option placeholder="请选择">
+          <el-select v-model="blog.category" filterable allow-create default-first-option placeholder="请选择">
             <el-option
               v-for="item in categories"
               :key="item.value"
@@ -86,7 +86,7 @@
         </el-form-item>
         <el-form-item label="标签">
           <el-tag
-            v-for="tag in dynamicTags"
+            v-for="tag in blog.tags"
             :key="tag"
             closable
             :disable-transitions="false"
@@ -117,14 +117,25 @@
           <el-button v-else class="button-new-tag" size="small" @click="showInput">新增</el-button>
         </el-form-item>
         <el-form-item label="上传博客">
-          <el-upload action="" :show-file-list="false">
-            <el-button icon="el-icon-upload" />
+          <el-upload
+            ref="upload"
+            class="upload-demo"
+            action=""
+            :http-request="uploadFileMethod"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :file-list="fileList"
+            :auto-upload="false"
+            :multiple="false"
+          >
+            <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传html文件</div>
           </el-upload>
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogVisible=false">取消</el-button>
-        <el-button type="primary" @click="confirm">提交</el-button>
+        <el-button type="primary" @click="submitUpload">提交</el-button>
       </div>
     </el-dialog>
   </div>
@@ -152,13 +163,13 @@ export default {
   filters: {},
   data() {
     return {
+      fileList: [],
       categories: [
         {
           value: 'Java',
           label: 'Java'
         }
       ],
-      category: '',
       options: [{
         label: '语言',
         options: [{
@@ -190,7 +201,6 @@ export default {
       types: [],
       dialogType: 'new',
       dialogVisible: false,
-      dynamicTags: [],
       inputVisible: false,
       inputValue: ''
     }
@@ -261,7 +271,7 @@ export default {
       this.editShow(scope.row.id)
     },
     handleDelete({ row }) {
-      this.$confirm('确认要删除该文章?', '警告', {
+      this.$confirm('确认要删除该博客?', '警告', {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning'
@@ -269,8 +279,8 @@ export default {
         .then(async() => {
           requestByClient(Blog, 'delete', '/api/blog/' + row.id, null, resp => {
             const respJson = resp.data
-            const { code } = respJson
-            if (code === 0) {
+            const { code, data } = respJson
+            if (code === 0 && data) {
               this.$notify({
                 title: '成功',
                 dangerouslyUseHTMLString: true,
@@ -310,7 +320,7 @@ export default {
       }
     },
     handleClose(tag) {
-      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+      this.blog.tags.splice(this.blog.tags.indexOf(tag), 1)
     },
     showInput() {
       this.inputVisible = true
@@ -318,10 +328,48 @@ export default {
     handleInputConfirm() {
       const inputValue = this.value
       if (inputValue) {
-        this.dynamicTags.push(inputValue)
+        this.blog.tags.push(inputValue)
       }
       this.inputVisible = false
       this.inputValue = ''
+    },
+    submitUpload() {
+      this.$refs.upload.submit()
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList)
+    },
+    handlePreview(file) {
+      console.log(file)
+    },
+    uploadFileMethod(param) {
+      this.dialogVisible = false
+      const fileObject = param.file
+      const formData = new FormData()
+      formData.append('file', fileObject)
+      formData.append('title', this.blog.title)
+      formData.append('introduction', this.blog.introduction)
+      formData.append('category', this.blog.category)
+      formData.append('tags', this.blog.tags.join(','))
+      requestByClient(Blog, 'put', '/api/blog', formData, resp => {
+        const respJson = resp.data
+        const { code } = respJson
+        if (code === 0) {
+          this.$message({
+            message: '发布成功',
+            type: 'success'
+          })
+          this.getList()
+        } else {
+          this.$notify({
+            title: '发布失败',
+            dangerouslyUseHTMLString: true,
+            message: `
+          `,
+            type: 'warning'
+          })
+        }
+      })
     }
   }
 }

@@ -1,6 +1,6 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
-import { Power, request } from '@/utils/HttpUtils'
+import { Auth, request } from '@/utils/HttpUtils'
 import { Connector } from '@/utils/WebSocketUtils'
 
 const state = {
@@ -46,7 +46,7 @@ export const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      Power({
+      Auth({
         method: 'post',
         url: '/auth/login',
         data: {
