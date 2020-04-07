@@ -13,7 +13,7 @@
       </div>
       <div class="box-center">
         <div class="user-name text-center">{{ user.name }}</div>
-        <div class="user-role text-center text-muted">{{ user.user | uppercaseFirst }}</div>
+        <div class="user-role text-center text-muted">{{ user.user }}</div>
       </div>
     </div>
 

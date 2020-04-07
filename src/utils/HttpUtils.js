@@ -1,14 +1,34 @@
 import axios from 'axios'
 import { getToken, removeToken } from '@/utils/auth'
 
-export const Power = axios.create({
+export const Auth = axios.create({
   // baseURL: 'http://apollo.free.idcfengye.com',
-  baseURL: 'http://127.0.0.1:8080',
+  baseURL: 'http://127.0.0.1:9999/auth',
   withCredentials: false
 })
 
+export const Blog = axios.create({
+  baseURL: 'http://127.0.0.1:9999/blog-admin',
+  withCredentials: false
+})
+
+export function requestByClient(client, method, url, data, then) {
+  client({
+    headers: {
+      'Authorization': getToken()
+    },
+    method: method,
+    url: url,
+    data: data
+  })
+    .then(then)
+    .catch(error => {
+      console.error(error)
+    })
+}
+
 export function request(method, url, data, then) {
-  Power({
+  Auth({
     headers: {
       'Authorization': getToken()
     },
@@ -20,7 +40,7 @@ export function request(method, url, data, then) {
     .catch(error => {
       console.error(error)
       if (error.toString() === 'Error: Network Error') {
-        Power({
+        Auth({
           headers: {
             'Authorization': getToken()
           },

@@ -96,7 +96,7 @@ export default {
       })
     }
     if (!Connector.connected) {
-      Connector.connect()
+      // Connector.connect()
     }
   },
   methods: {

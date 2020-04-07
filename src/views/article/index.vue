@@ -35,14 +35,19 @@
           <span class="link-type" @click="look(row)">{{ row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="时间" prop="time" sortable="custom" align="center" :class-name="getSortClass('time')">
+      <el-table-column label="发布时间" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.time }}</span>
+          <span>{{ scope.row.publishTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="类型" sortable="custom" align="center">
+      <el-table-column label="分类" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.typeName }}</span>
+          <span>{{ scope.row.category }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="阅读数量" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.views }}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作">
@@ -53,27 +58,122 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.number" @pagination="getList" />
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="listQuery.page"
+      :limit.sync="listQuery.number"
+      @pagination="getList"
+    />
+
+    <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑博客':'新增博客'">
+      <el-form :model="blog" label-width="80px" label-position="left">
+        <el-form-item label="标题">
+          <el-input v-model="blog.title" placeholder="标题" />
+        </el-form-item>
+        <el-form-item label="介绍">
+          <el-input v-model="blog.introduction" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="介绍" />
+        </el-form-item>
+        <el-form-item label="分类">
+          <el-select v-model="category" filterable allow-create default-first-option placeholder="请选择">
+            <el-option
+              v-for="item in categories"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="标签">
+          <el-tag
+            v-for="tag in dynamicTags"
+            :key="tag"
+            closable
+            :disable-transitions="false"
+            @close="handleClose(tag)"
+          >
+            {{ tag }}
+          </el-tag>
+          <el-select
+            v-if="inputVisible"
+            v-model="value"
+            class="input-new-tag"
+            placeholder="请选择"
+            @change="handleInputConfirm"
+          >
+            <el-option-group
+              v-for="group in options"
+              :key="group.label"
+              :label="group.label"
+            >
+              <el-option
+                v-for="item in group.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-option-group>
+          </el-select>
+          <el-button v-else class="button-new-tag" size="small" @click="showInput">新增</el-button>
+        </el-form-item>
+        <el-form-item label="上传博客">
+          <el-upload action="" :show-file-list="false">
+            <el-button icon="el-icon-upload" />
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <div style="text-align:right;">
+        <el-button type="danger" @click="dialogVisible=false">取消</el-button>
+        <el-button type="primary" @click="confirm">提交</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import waves from '@/directive/waves'
-import Pagination from '@/components/Pagination'
-import { request } from '@/utils/HttpUtils'
+import waves from '../../directive/waves'
+import Pagination from '../../components/Pagination'
+import { Blog, requestByClient } from '../../utils/HttpUtils'
+
+const defaultBlog = {
+  id: null,
+  title: '',
+  introduction: '',
+  publishTime: '',
+  category: '',
+  tags: [],
+  views: 0
+}
 
 export default {
   name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
-  filters: {
-  },
+  filters: {},
   data() {
     return {
+      categories: [
+        {
+          value: 'Java',
+          label: 'Java'
+        }
+      ],
+      category: '',
       options: [{
-        value: 'ARTICLE',
-        label: '文章类型'
+        label: '语言',
+        options: [{
+          value: 'Java',
+          label: 'Java'
+        }]
+      }, {
+        label: '框架',
+        options: [{
+          value: 'Spring boot',
+          label: 'Spring boot'
+        }]
       }],
+      value: '',
+      blog: Object.assign({}, defaultBlog),
       tableKey: 0,
       list: null,
       total: 0,
@@ -87,11 +187,15 @@ export default {
           type: null
         }
       },
-      types: this.$store.getters.selfSettings.ARTICLE ? this.$store.getters.selfSettings.ARTICLE : []
+      types: [],
+      dialogType: 'new',
+      dialogVisible: false,
+      dynamicTags: [],
+      inputVisible: false,
+      inputValue: ''
     }
   },
-  computed: {
-  },
+  computed: {},
   created() {
     this.getList()
   },
@@ -103,18 +207,11 @@ export default {
     },
     getList() {
       this.listLoading = true
-      request('post', '/api/article/page', this.listQuery, resp => {
+      requestByClient(Blog, 'post', '/api/blog/page', this.listQuery, resp => {
         const respJson = resp.data
         const { code } = respJson
         if (code === 0) {
           this.list = respJson.data.items
-          const typeMap = new Map()
-          this.types.forEach(item => {
-            typeMap.set(item.id, item.name)
-          })
-          this.list.forEach(item => {
-            item.typeName = typeMap.get(item.type)
-          })
           this.total = respJson.data.total
         }
         this.listLoading = false
@@ -150,8 +247,8 @@ export default {
       }
     },
     addShow() {
-      localStorage.removeItem('currentEditArticleId')
-      this.$router.push({ path: '/article/edit' || '/', query: this.otherQuery })
+      this.dialogType = 'new'
+      this.dialogVisible = true
     },
     handleAdd() {
       this.addShow()
@@ -170,7 +267,7 @@ export default {
         type: 'warning'
       })
         .then(async() => {
-          request('delete', '/api/article/' + row.id, null, resp => {
+          requestByClient(Blog, 'delete', '/api/blog/' + row.id, null, resp => {
             const respJson = resp.data
             const { code } = respJson
             if (code === 0) {
@@ -185,8 +282,65 @@ export default {
             }
           })
         })
-        .catch(err => { console.error(err) })
+        .catch(err => {
+          console.error(err)
+        })
+    },
+    async confirm() {
+      const isEdit = this.dialogType === 'edit'
+      this.config.customInfo = JSON.parse(this.config.customInfo)
+      if (isEdit) {
+        requestByClient(Blog, 'post', '/api/blog', this.config, resp => {
+          const respJson = resp.data
+          const { code } = respJson
+          if (code === 0) {
+            this.showSuccess()
+            this.getList()
+          }
+        })
+      } else {
+        requestByClient(Blog, 'put', '/api/blog', this.config, resp => {
+          const respJson = resp.data
+          const { code } = respJson
+          if (code === 0) {
+            this.showSuccess()
+            this.getList()
+          }
+        })
+      }
+    },
+    handleClose(tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+    },
+    showInput() {
+      this.inputVisible = true
+    },
+    handleInputConfirm() {
+      const inputValue = this.value
+      if (inputValue) {
+        this.dynamicTags.push(inputValue)
+      }
+      this.inputVisible = false
+      this.inputValue = ''
     }
   }
 }
 </script>
+
+<style scoped>
+  .el-tag + .el-tag {
+    margin-left: 10px;
+  }
+
+  .button-new-tag {
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .input-new-tag {
+    width: 90px;
+    vertical-align: bottom;
+  }
+</style>
