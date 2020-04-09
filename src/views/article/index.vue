@@ -75,7 +75,7 @@
           <el-input v-model="blog.introduction" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="介绍" />
         </el-form-item>
         <el-form-item label="分类">
-          <el-select v-model="blog.category" filterable allow-create default-first-option placeholder="请选择">
+          <el-select v-model="blog.category" filterable allow-create default-first-option placeholder="请选择" @change="newCategory">
             <el-option
               v-for="item in categories"
               :key="item.value"
@@ -96,23 +96,20 @@
           </el-tag>
           <el-select
             v-if="inputVisible"
-            v-model="value"
+            v-model="addTag"
             class="input-new-tag"
+            filterable
+            allow-create
+            default-first-option
             placeholder="请选择"
             @change="handleInputConfirm"
           >
-            <el-option-group
-              v-for="group in options"
-              :key="group.label"
-              :label="group.label"
-            >
-              <el-option
-                v-for="item in group.options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-option-group>
+            <el-option
+              v-for="item in tags"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
           </el-select>
           <el-button v-else class="button-new-tag" size="small" @click="showInput">新增</el-button>
         </el-form-item>
@@ -170,20 +167,14 @@ export default {
           label: 'Java'
         }
       ],
-      options: [{
-        label: '语言',
-        options: [{
-          value: 'Java',
-          label: 'Java'
-        }]
+      tags: [{
+        value: 'Java',
+        label: 'Java'
       }, {
-        label: '框架',
-        options: [{
-          value: 'Spring boot',
-          label: 'Spring boot'
-        }]
+        value: 'Spring boot',
+        label: 'Spring boot'
       }],
-      value: '',
+      addTag: '',
       blog: Object.assign({}, defaultBlog),
       tableKey: 0,
       list: null,
@@ -321,17 +312,30 @@ export default {
     },
     handleClose(tag) {
       this.blog.tags.splice(this.blog.tags.indexOf(tag), 1)
+      this.tags.push({ 'value': tag, 'label': tag })
     },
     showInput() {
+      this.addTag = ''
       this.inputVisible = true
     },
     handleInputConfirm() {
-      const inputValue = this.value
+      const inputValue = this.addTag
+      console.log(inputValue)
       if (inputValue) {
         this.blog.tags.push(inputValue)
+        const n = this.tags.length
+        const newTags = []
+        for (let i = 0; i < n; i++) {
+          const item = this.tags[i]
+          if (item.value !== inputValue) {
+            newTags.push({ 'value': item.value, 'label': item.value })
+          }
+        }
+        this.tags = newTags
+        console.log(this.tags)
+        this.inputVisible = false
+        this.inputValue = ''
       }
-      this.inputVisible = false
-      this.inputValue = ''
     },
     submitUpload() {
       this.$refs.upload.submit()
@@ -341,6 +345,17 @@ export default {
     },
     handlePreview(file) {
       console.log(file)
+    },
+    newCategory() {
+      const category = this.blog.category
+      const length = this.categories.length
+      for (let i = 0; i < length; i++) {
+        const item = this.categories[i]
+        if (item.value === category) {
+          return
+        }
+      }
+      this.categories.push({ 'value': category, 'label': category })
     },
     uploadFileMethod(param) {
       this.dialogVisible = false
@@ -388,7 +403,6 @@ export default {
   }
 
   .input-new-tag {
-    width: 90px;
     vertical-align: bottom;
   }
 </style>
