@@ -1,18 +1,11 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-select v-model="listQuery.customParams.type" class="filter-item" placeholder="请选择类型">
-        <el-option
-          v-for="item in types"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id"
-        />
-      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         查询
       </el-button>
       <el-button class="filter-item" type="primary" @click="handleAdd">新增文章</el-button>
+      <el-button class="filter-item" type="warning" @click="sync">同步全部数据</el-button>
     </div>
 
     <el-table
@@ -25,7 +18,7 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="ID" align="center" width="150">
+      <el-table-column label="ID" align="center" width="300">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
@@ -53,6 +46,7 @@
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope)">编辑</el-button>
+          <el-button type="warning" size="small" @click="sync(scope)">同步</el-button>
           <el-button type="danger" size="small" @click="handleDelete(scope)">删除</el-button>
         </template>
       </el-table-column>
@@ -75,7 +69,14 @@
           <el-input v-model="blog.introduction" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="介绍" />
         </el-form-item>
         <el-form-item label="分类">
-          <el-select v-model="blog.category" filterable allow-create default-first-option placeholder="请选择" @change="newCategory">
+          <el-select
+            v-model="blog.category"
+            filterable
+            allow-create
+            default-first-option
+            placeholder="请选择"
+            @change="newCategory"
+          >
             <el-option
               v-for="item in categories"
               :key="item.value"
@@ -161,12 +162,8 @@ export default {
   data() {
     return {
       fileList: [],
-      categories: [
-        {
-          value: 'Java',
-          label: 'Java'
-        }
-      ],
+      categories: [],
+      categoriesLoading: false,
       tags: [{
         value: 'Java',
         label: 'Java'
@@ -189,7 +186,6 @@ export default {
           type: null
         }
       },
-      types: [],
       dialogType: 'new',
       dialogVisible: false,
       inputVisible: false,
@@ -201,11 +197,6 @@ export default {
     this.getList()
   },
   methods: {
-    look(row) {
-      const { id } = row
-      localStorage.setItem('currentArticleId', id)
-      this.$router.push({ path: '/article/look' || '/', query: this.otherQuery })
-    },
     getList() {
       this.listLoading = true
       requestByClient(Blog, 'post', '/api/blog/page', this.listQuery, resp => {
@@ -217,10 +208,6 @@ export default {
         }
         this.listLoading = false
       })
-    },
-    handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
     },
     sortChange(data) {
       const { prop, order } = data
@@ -238,7 +225,11 @@ export default {
       }
       this.handleFilter()
     },
-    getSortClass: function(filed) {
+    handleFilter() {
+      this.listQuery.page = 1
+      this.getList()
+    },
+    getSortClass(filed) {
       const asc = this.listQuery.asc
       const sort = this.listQuery.sort
       if (sort === filed) {
@@ -248,15 +239,36 @@ export default {
       }
     },
     addShow() {
-      this.dialogType = 'new'
-      this.dialogVisible = true
+      requestByClient(Blog, 'get', '/api/category/findAll', null, resp => {
+        const respJson = resp.data
+        const { code, data } = respJson
+        if (code === 0) {
+          this.categories = []
+          data.forEach(item => {
+            this.categories.push({ 'value': item.name, 'label': item.name })
+          })
+          this.dialogType = 'new'
+          this.dialogVisible = true
+        }
+      })
     },
     handleAdd() {
       this.addShow()
     },
     editShow(id) {
-      localStorage.setItem('currentEditArticleId', id)
-      this.$router.push({ path: '/article/edit' || '/', query: this.otherQuery })
+      requestByClient(Blog, 'get', '/api/blog/get/' + id, null, resp => {
+        const respJson = resp.data
+        const { code, data } = respJson
+        if (code === 0) {
+          this.blog.id = data.id
+          this.blog.title = data.title
+          this.blog.introduction = data.introduction
+          this.blog.category = data.category
+          this.blog.tags = data.tags
+          this.blog.publishTime = data.publishTime
+          this.addShow()
+        }
+      })
     },
     handleEdit(scope) {
       this.editShow(scope.row.id)
@@ -276,7 +288,7 @@ export default {
                 title: '成功',
                 dangerouslyUseHTMLString: true,
                 message: `
-          `,
+        `,
                 type: 'success'
               })
               this.getList()
@@ -315,13 +327,22 @@ export default {
       this.tags.push({ 'value': tag, 'label': tag })
     },
     showInput() {
+      requestByClient(Blog, 'get', '/api/tag/findAll', null, resp => {
+        const respJson = resp.data
+        const { code, data } = respJson
+        if (code === 0) {
+          this.tags = []
+          data.forEach(item => {
+            this.tags.push({ 'value': item.name, 'label': item.name })
+          })
+        }
+      })
       this.addTag = ''
       this.inputVisible = true
     },
     handleInputConfirm() {
       const inputValue = this.addTag
-      console.log(inputValue)
-      if (inputValue) {
+      if (inputValue.trim() !== '') {
         this.blog.tags.push(inputValue)
         const n = this.tags.length
         const newTags = []
@@ -332,7 +353,6 @@ export default {
           }
         }
         this.tags = newTags
-        console.log(this.tags)
         this.inputVisible = false
         this.inputValue = ''
       }
@@ -348,14 +368,16 @@ export default {
     },
     newCategory() {
       const category = this.blog.category
-      const length = this.categories.length
-      for (let i = 0; i < length; i++) {
-        const item = this.categories[i]
-        if (item.value === category) {
-          return
+      if (category.trim() !== '') {
+        const length = this.categories.length
+        for (let i = 0; i < length; i++) {
+          const item = this.categories[i]
+          if (item.value === category) {
+            return
+          }
         }
+        this.categories.push({ 'value': category, 'label': category })
       }
-      this.categories.push({ 'value': category, 'label': category })
     },
     uploadFileMethod(param) {
       this.dialogVisible = false
@@ -380,7 +402,28 @@ export default {
             title: '发布失败',
             dangerouslyUseHTMLString: true,
             message: `
-          `,
+        `,
+            type: 'warning'
+          })
+        }
+      })
+    },
+    sync(scope) {
+      const url = scope.row ? '/api/blog/sync?id=' + scope.row.id : '/api/blog/sync'
+      requestByClient(Blog, 'get', url, null, resp => {
+        const respJson = resp.data
+        const { code } = respJson
+        if (code === 0) {
+          this.$message({
+            message: '申请同步成功，请耐心等待结果',
+            type: 'success'
+          })
+        } else {
+          this.$notify({
+            title: '申请同步失败',
+            dangerouslyUseHTMLString: true,
+            message: `
+        `,
             type: 'warning'
           })
         }
