@@ -60,7 +60,7 @@
       @pagination="getList"
     />
 
-    <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑博客':'新增博客'">
+    <el-dialog :visible.sync="dialogVisible" :title="dialogType === 'edit' ? '编辑博客' : '新增博客'">
       <el-form :model="blog" label-width="80px" label-position="left">
         <el-form-item label="标题">
           <el-input v-model="blog.title" placeholder="标题" />
@@ -252,6 +252,20 @@ export default {
         }
       })
     },
+    showCategories() {
+      requestByClient(Blog, 'get', '/api/category/findAll', null, resp => {
+        const respJson = resp.data
+        const { code, data } = respJson
+        if (code === 0) {
+          this.categories = []
+          data.forEach(item => {
+            this.categories.push({ 'value': item.name, 'label': item.name })
+          })
+          this.dialogType = 'edit'
+          this.dialogVisible = true
+        }
+      })
+    },
     handleAdd() {
       this.addShow()
     },
@@ -266,7 +280,7 @@ export default {
           this.blog.category = data.category
           this.blog.tags = data.tags
           this.blog.publishTime = data.publishTime
-          this.addShow()
+          this.showCategories()
         }
       })
     },
@@ -380,26 +394,33 @@ export default {
       }
     },
     uploadFileMethod(param) {
+      let method
+      if (this.dialogType === 'edit') {
+        method = 'post'
+      } else {
+        method = 'put'
+      }
       this.dialogVisible = false
       const fileObject = param.file
       const formData = new FormData()
       formData.append('file', fileObject)
+      formData.append('id', this.blog.id)
       formData.append('title', this.blog.title)
       formData.append('introduction', this.blog.introduction)
       formData.append('category', this.blog.category)
       formData.append('tags', this.blog.tags.join(','))
-      requestByClient(Blog, 'put', '/api/blog', formData, resp => {
+      requestByClient(Blog, method, '/api/blog', formData, resp => {
         const respJson = resp.data
         const { code } = respJson
         if (code === 0) {
           this.$message({
-            message: '发布成功',
+            message: '成功',
             type: 'success'
           })
           this.getList()
         } else {
           this.$notify({
-            title: '发布失败',
+            title: '失败',
             dangerouslyUseHTMLString: true,
             message: `
         `,

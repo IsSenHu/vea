@@ -1,7 +1,7 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
-import { Auth, request } from '@/utils/HttpUtils'
 import { Connector } from '@/utils/WebSocketUtils'
+import { Auth, requestByClient } from '../../utils/HttpUtils'
 
 const state = {
   token: getToken(),
@@ -46,14 +46,7 @@ export const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      Auth({
-        method: 'post',
-        url: '/auth/login',
-        data: {
-          username: username,
-          password: password
-        }
-      }).then(resp => {
+      requestByClient(Auth, 'post', '/auth/login', { username: username, password: password }, resp => {
         const respJson = resp.data
         const { code, data } = respJson
         if (code === 0) {
@@ -95,7 +88,7 @@ export const actions = {
   // user logout
   logout({ commit }) {
     return new Promise((resolve, reject) => {
-      request('post', '/auth/logout', null, resp => {
+      requestByClient(Auth, 'post', '/auth/logout', null, resp => {
         const respJson = resp.data
         const { code } = respJson
         if (code === 0) {

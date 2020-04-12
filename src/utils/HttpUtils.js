@@ -3,12 +3,12 @@ import { getToken, removeToken } from '@/utils/auth'
 
 export const Auth = axios.create({
   // baseURL: 'http://apollo.free.idcfengye.com',
-  baseURL: 'http://127.0.0.1:9999/auth',
+  baseURL: 'http://118.24.38.46:7777/gateway/auth',
   withCredentials: false
 })
 
 export const Blog = axios.create({
-  baseURL: 'http://127.0.0.1:9999/blog-admin',
+  baseURL: 'http://118.24.38.46:7777/gateway/blog-admin',
   withCredentials: false
 })
 
