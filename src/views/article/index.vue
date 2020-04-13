@@ -409,10 +409,11 @@ export default {
       formData.append('introduction', this.blog.introduction)
       formData.append('category', this.blog.category)
       formData.append('tags', this.blog.tags.join(','))
+      formData.append('publishTime', this.blog.publishTime)
       requestByClient(Blog, method, '/api/blog', formData, resp => {
         const respJson = resp.data
-        const { code } = respJson
-        if (code === 0) {
+        const { code, data } = respJson
+        if (code === 0 && data) {
           this.$message({
             message: '成功',
             type: 'success'
