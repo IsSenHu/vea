@@ -12,6 +12,11 @@ export const Blog = axios.create({
   withCredentials: false
 })
 
+export const Health = axios.create({
+  baseURL: 'http://118.24.38.46:7777/gateway/health-server',
+  withCredentials: false
+})
+
 export function requestByClient(client, method, url, data, then) {
   client({
     headers: {

@@ -114,6 +114,14 @@ export const constantRoutes = [
         meta: {
           title: '睡眠'
         }
+      },
+      {
+        path: 'bodyDataList',
+        component: () => import('@/views/health/body-data/index'),
+        name: 'pageBodyData',
+        meta: {
+          title: '身体数据'
+        }
       }
     ]
   },
