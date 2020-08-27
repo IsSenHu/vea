@@ -127,7 +127,7 @@
             :multiple="false"
           >
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传html文件</div>
+            <div slot="tip" class="el-upload__tip">只能上传markdown文件</div>
           </el-upload>
         </el-form-item>
       </el-form>
@@ -183,7 +183,7 @@ export default {
         sort: 'time',
         asc: true,
         customParams: {
-          type: null
+
         }
       },
       dialogType: 'new',

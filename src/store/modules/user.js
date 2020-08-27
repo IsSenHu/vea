@@ -53,7 +53,12 @@ export const actions = {
           commit('SET_TOKEN', data.token)
           commit('SET_JUST_LOGIN', true)
           setToken(data.token)
-          localStorage.setItem('info', JSON.stringify(data.info))
+          const storageInfo = {}
+          storageInfo.name = data.name
+          storageInfo.introduction = data.introduction
+          storageInfo.avatar = data.avatar
+          storageInfo.roles = data.roles
+          localStorage.setItem('info', JSON.stringify(storageInfo))
           resolve()
         } else {
           reject(respJson.error)
